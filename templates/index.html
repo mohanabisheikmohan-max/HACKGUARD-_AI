@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HackGuard AI | Security Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{--bg:#07101d;--panel:#0d1b2b;--panel2:#102338;--line:#1b3850;--text:#e8f4ff;--muted:#8ba7bd;--cyan:#38d9ff;--green:#39e6a5;--amber:#ffc86b;--red:#ff6f86}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 70% 0%,#102e46 0,transparent 35%),var(--bg);color:var(--text);font:15px/1.5 Inter,Segoe UI,Arial,sans-serif;min-height:100vh}
+.shell{display:grid;grid-template-columns:245px 1fr;min-height:100vh}.sidebar{padding:27px 18px;border-right:1px solid var(--line);background:#081421}
+.brand{display:flex;align-items:center;gap:11px;font-size:20px;font-weight:800;letter-spacing:.3px;margin:0 8px 35px}.logo{display:grid;place-items:center;width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--cyan),#5874ff);color:#06121e;font-size:21px}
+.label{font-size:11px;color:#62829a;text-transform:uppercase;letter-spacing:1.7px;margin:24px 12px 10px}.nav{display:flex;align-items:center;gap:12px;color:var(--muted);padding:12px;border-radius:10px;margin:4px 0}.nav.active{background:#102c41;color:var(--cyan);border:1px solid #1b5269}.nav span:first-child{width:20px;text-align:center}
+.side-note{margin-top:38px;padding:14px;border:1px solid var(--line);border-radius:13px;color:var(--muted);font-size:12px;background:#0b1b2a}.side-note strong{display:block;color:var(--green);margin-bottom:6px}
+main{padding:30px clamp(18px,3vw,44px);max-width:1600px;width:100%;margin:auto}.topbar{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:27px}.eyebrow{color:var(--cyan);font-size:11px;letter-spacing:2px;text-transform:uppercase}.topbar h1{font-size:clamp(24px,3vw,34px);margin:5px 0 0;letter-spacing:-.8px}.profile{border:1px solid var(--line);border-radius:30px;padding:9px 14px;color:var(--muted);white-space:nowrap}.profile b{color:var(--green)}
+.hero{display:grid;grid-template-columns:1.4fr .8fr;gap:20px;margin-bottom:20px}.card{background:linear-gradient(145deg,rgba(16,35,56,.97),rgba(10,24,39,.97));border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 12px 36px #0002}.hero h2{margin:0 0 7px;font-size:20px}.muted{color:var(--muted)}.scanform{display:flex;gap:10px;margin-top:22px}.scanform input{flex:1;min-width:0;background:#061321;border:1px solid #24445c;border-radius:10px;padding:14px;color:var(--text);outline:none}.scanform input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px #38d9ff1c}.btn{border:0;border-radius:10px;padding:13px 17px;font-weight:750;cursor:pointer;transition:.2s}.btn-primary{background:linear-gradient(120deg,var(--cyan),#69a7ff);color:#06121d}.btn:hover{transform:translateY(-1px);filter:brightness(1.08)}.btn:disabled{opacity:.6;cursor:wait}.hint{font-size:12px;color:var(--muted);margin-top:11px}.scorebox{display:flex;align-items:center;justify-content:center;gap:18px;min-height:175px}.gauge{width:124px;height:124px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--green) 0deg,#18364a 0deg);position:relative;flex-shrink:0}.gauge:before{content:"";position:absolute;inset:9px;background:#0d1c2c;border-radius:50%}.gaugeinner{z-index:1;text-align:center}.gaugeinner strong{font-size:32px;display:block}.gaugeinner span{font-size:10px;color:var(--muted);letter-spacing:1px}.scorecaption{max-width:150px}.scorecaption b{display:block;font-size:17px;margin-bottom:5px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-bottom:20px}.stat{padding:17px 19px}.stat .statname{font-size:12px;color:var(--muted)}.stat strong{display:block;font-size:27px;margin:7px 0 2px}.stat small{color:var(--muted);font-size:11px}.stat .icon{float:right;font-size:19px;color:var(--cyan)}
+.contentgrid{display:grid;grid-template-columns:1.15fr .85fr;gap:20px}.cardhead{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px}.cardhead h3{font-size:16px;margin:0}.pill{font-size:11px;padding:5px 9px;border-radius:20px;background:#123047;color:var(--cyan);white-space:nowrap}.findings{display:grid;gap:10px}.finding{display:flex;align-items:flex-start;gap:12px;padding:12px;border:1px solid #1a344a;border-radius:12px;background:#091827}.dot{width:9px;height:9px;border-radius:50%;margin-top:6px;flex-shrink:0}.pass{background:var(--green)}.warn{background:var(--amber)}.fail{background:var(--red)}.finding b{display:block;font-size:13px}.finding p{margin:3px 0 0;color:var(--muted);font-size:12px}.status{margin-left:auto;font-size:10px;text-transform:uppercase;letter-spacing:1px}.status.pass{color:var(--green);background:none}.status.warn{color:var(--amber);background:none}.status.fail{color:var(--red);background:none}
+.chartwrap{height:240px;position:relative}.empty{color:var(--muted);text-align:center;padding:45px 10px;font-size:13px}.reportrow{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:18px}.btn-outline{background:transparent;color:var(--cyan);border:1px solid #23607a;padding:9px 12px}.footnote{margin:20px 2px 0;color:#708ba1;font-size:11px}
+.toast{margin-top:12px;padding:10px 12px;border:1px solid #613a4a;background:#281722;border-radius:10px;color:#ffb7c3;font-size:13px;display:none}.spinner{display:inline-block;width:13px;height:13px;border:2px solid #0b2536;border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}@keyframes spin{to{transform:rotate(360deg)}}@media(max-width:1000px){.shell{grid-template-columns:76px 1fr}.sidebar{padding:20px 10px}.brand{justify-content:center;margin:0 0 30px}.brandtext,.navtext,.label,.side-note{display:none}.nav{justify-content:center;padding:13px 5px}.hero{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}@media(max-width:700px){.shell{display:block}.sidebar{display:none}main{padding:20px 14px}.topbar{align-items:flex-start}.profile{font-size:11px}.scanform{flex-direction:column}.contentgrid{grid-template-columns:1fr}.stats{gap:10px}.stat{padding:14px}.stat strong{font-size:23px}.scorebox{justify-content:flex-start}.hero .card{padding:18px}}
+</style>
+</head>
+<body>
+<div class="shell">
+<aside class="sidebar">
+<div class="brand"><div class="logo">⌁</div><span class="brandtext">HACKGUARD<span style="color:var(--cyan)"> AI</span></span></div>
+<div class="label">Workspace</div>
+<div class="nav active"><span>▦</span><span class="navtext">Dashboard</span></div>
+<div class="nav"><span>⌕</span><span class="navtext">Website Check</span></div>
+<div class="nav"><span>◈</span><span class="navtext">Security Headers</span></div>
+<div class="nav"><span>▤</span><span class="navtext">Reports</span></div>
+<div class="label">Resources</div>
+<div class="nav"><span>⌘</span><span class="navtext">Learning Hub</span></div>
+<div class="side-note"><strong>● SAFE MODE ENABLED</strong>Basic checks only. Test systems you own or have permission to assess.</div>
+</aside>
+<main>
+<header class="topbar"><div><div class="eyebrow">Cybersecurity • Defensive tools</div><h1>Security Overview</h1></div><div class="profile">● <b>System ready</b> &nbsp;|&nbsp; Demo</div></header>
+<section class="hero">
+<div class="card">
+<div class="eyebrow">Website assessment</div><h2>Check a website's security baseline</h2>
+<div class="muted">Inspect HTTPS and common response security headers with a single basic request.</div>
+<form class="scanform" id="scanForm"><input id="urlInput" type="text" placeholder="https://example.com" aria-label="Website URL" required><button class="btn btn-primary" id="scanBtn" type="submit">⌕ &nbsp; Check site</button></form>
+<div class="hint">Only check public websites you own or are explicitly authorized to assess.</div><div class="toast" id="errorBox"></div>
+</div>
+<div class="card"><div class="cardhead"><h3>Baseline score</h3><span class="pill">HEURISTIC</span></div><div class="scorebox"><div class="gauge" id="gauge"><div class="gaugeinner"><strong id="scoreValue">—</strong><span>OUT OF 100</span></div></div><div class="scorecaption"><b id="scoreTitle">Awaiting check</b><span class="muted" id="scoreSummary" style="font-size:12px">Enter a URL to see results.</span></div></div></div>
+</section>
+<section class="stats">
+<div class="card stat"><span class="icon">◎</span><div class="statname">Sites checked</div><strong id="sitesChecked">0</strong><small>this browser session</small></div>
+<div class="card stat"><span class="icon">✓</span><div class="statname">Checks passed</div><strong id="passedCount">—</strong><small>from latest check</small></div>
+<div class="card stat"><span class="icon">!</span><div class="statname">Warnings</div><strong id="warningCount">—</strong><small>from latest check</small></div>
+<div class="card stat"><span class="icon">◷</span><div class="statname">Last checked</div><strong id="lastChecked" style="font-size:17px">—</strong><small>local time</small></div>
+</section>
+<section class="contentgrid">
+<div class="card"><div class="cardhead"><h3>Security findings</h3><span class="pill" id="resultPill">NO RESULTS</span></div><div class="findings" id="findings"><div class="empty">Your findings will appear here after you check a website.</div></div><div class="reportrow"><span class="muted" style="font-size:11px">Export latest result</span><button class="btn btn-outline" id="downloadBtn" disabled>↓ Download CSV</button></div></div>
+<div class="card"><div class="cardhead"><h3>Check breakdown</h3><span class="pill">LATEST RESULT</span></div><div class="chartwrap"><canvas id="resultsChart" aria-label="Security check breakdown chart"></canvas><div class="empty" id="chartEmpty">Run a check to populate the chart.</div></div><p class="footnote">A score is a simple checklist indicator—not a guarantee that a website is secure.</p></div>
+</section>
+<div class="footnote">HACKGUARD AI • Educational defensive security project • No exploitation, brute force, or port scanning.</div>
+</main></div>
+<script>
+let latestUrl = "";
+let sites = 0;
+let chart = null;
+const $ = id => document.getElementById(id);
+function statusLabel(s){return s === "pass" ? "Passed" : s === "fail" ? "Needs attention" : "Review";}
+function renderChart(checks){
+ const counts = {pass:0,warn:0,fail:0}; checks.forEach(c=>counts[c.status] = (counts[c.status]||0)+1);
+ $("chartEmpty").style.display="none";
+ if(chart) chart.destroy();
+ chart = new Chart($("resultsChart"), {type:"doughnut",data:{labels:["Passed","Review","Needs attention"],datasets:[{data:[counts.pass,counts.warn,counts.fail],backgroundColor:["#39e6a5","#ffc86b","#ff6f86"],borderColor:"#0d1b2b",borderWidth:5,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,cutout:"70%",plugins:{legend:{position:"bottom",labels:{color:"#9bb4c7",padding:18,usePointStyle:true,pointStyle:"circle"}},tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${ctx.raw}`}}}}});
+}
+function renderResult(data){
+ latestUrl = data.url; sites++; $("sitesChecked").textContent=sites;
+ $("scoreValue").textContent=data.score;
+ $("gauge").style.background=`conic-gradient(${data.score>=80?"#39e6a5":data.score>=50?"#ffc86b":"#ff6f86"} ${data.score*3.6}deg,#18364a 0deg)`;
+ $("scoreTitle").textContent=data.score>=80?"Good baseline":data.score>=50?"Needs review":"Action recommended";
+ $("scoreSummary").textContent=data.summary;
+ const passed=data.checks.filter(c=>c.status==="pass").length, warnings=data.checks.filter(c=>c.status==="warn").length, failed=data.checks.filter(c=>c.status==="fail").length;
+ $("passedCount").textContent=passed; $("warningCount").textContent=warnings+failed; $("lastChecked").textContent=data.checked_at.split(" ")[1]||"Just now";
+ $("resultPill").textContent=`${data.checks.length} CHECKS`;
+ $("findings").innerHTML="";
+ data.checks.forEach(c=>{const row=document.createElement("div");row.className="finding";const dot=document.createElement("span");dot.className="dot "+c.status;const body=document.createElement("div");body.style.flex="1";const title=document.createElement("b");title.textContent=c.name;const desc=document.createElement("p");desc.textContent=c.detail;const status=document.createElement("span");status.className="status "+c.status;status.textContent=statusLabel(c.status);row.append(dot,body,status);body.append(title,desc);$("findings").append(row)});
+ renderChart(data.checks); $("downloadBtn").disabled=false;
+ $("errorBox").style.display="none";
+}
+$("scanForm").addEventListener("submit",async e=>{
+ e.preventDefault(); const url=$("urlInput").value.trim(); const btn=$("scanBtn"); const error=$("errorBox");
+ btn.disabled=true;btn.innerHTML='<span class="spinner"></span>Checking…';error.style.display="none";
+ try{
+  const response=await fetch("/api/check",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({url})});
+  const data=await response.json(); if(!response.ok) throw new Error(data.error||"Could not check that URL.");
+  renderResult(data);
+ }catch(err){error.textContent=err.message||"Something went wrong. Please try again.";error.style.display="block";}
+ finally{btn.disabled=false;btn.innerHTML="⌕ &nbsp; Check site";}
+});
+$("downloadBtn").addEventListener("click",async()=>{
+ if(!latestUrl)return; const btn=$("downloadBtn");btn.disabled=true;
+ try{const response=await fetch("/api/report.csv",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({url:latestUrl})});const dataType=response.headers.get("content-type")||"";
+ if(!response.ok){const data=await response.json();throw new Error(data.error||"Report failed");}
+ const blob=await response.blob();const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="hackguard-security-report.csv";a.click();URL.revokeObjectURL(a.href);
+ }catch(e){const box=$("errorBox");box.textContent=e.message;box.style.display="block";}finally{btn.disabled=false;}
+});
+</script>
+</body>
+</html>
